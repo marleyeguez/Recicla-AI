@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ler QR Code · Recicla AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">♻</div><div class="brand-copy"><strong>Recicla AI</strong><small>Juntos por um futuro mais limpo.</small></div></div>
+  <div class="sidebar-user"><div class="avatar">JS</div><div><strong>João Silva</strong><small>Usuário</small></div></div>
+  <nav class="sidebar-nav"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Início</a>
+<a class="nav-link  mobile-hide" href="perfil.html"><span class="ico">♙</span>Meu Perfil</a>
+<a class="nav-link  mobile-hide" href="pontos.html"><span class="ico">★</span>Meus Pontos</a>
+<a class="nav-link  mobile-hide" href="historico.html"><span class="ico">◴</span>Histórico</a>
+<a class="nav-link active " href="qrcode.html"><span class="ico">⌗</span>Ler QR Code</a>
+<a class="nav-link  " href="ecopontos.html"><span class="ico">⌖</span>Ecopontos</a>
+<a class="nav-link  " href="recompensas.html"><span class="ico">♧</span>Recompensas</a></nav>
+  <div class="sidebar-footer"><a class="logout-link" href="index.html">↪ <span>Sair</span></a></div>
+</aside>
+<main class="app-main">
+
+<header class="topbar">
+  <div class="mobile-brand">♻ <span>Recicla AI</span></div>
+  <div class="top-actions">
+    <button class="icon-circle" onclick="toast('Você não possui novas notificações.')">♧</button>
+    <div class="top-user"><div class="avatar">JS</div><span>João Silva⌄</span></div>
+  </div>
+</header>
+<div class="page-wrap">
+<div class="page-head"><div><h1>Ler QR Code</h1><p>Aponte a câmera para o QR Code gerado pela máquina de reciclagem para ganhar seus pontos.</p></div></div>
+<section class="scanner-card card">
+  <div class="scanner-frame">
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div id="qrPlaceholder" class="qr-glyph">▦</div><video id="qrVideo" class="qr-video" playsinline muted hidden></video><div class="scan-line"></div>
+  </div>
+  <h3 id="qrStatus">Aguardando leitura do QR Code...</h3>
+  <div class="scanner-tip">ⓘ <strong>Dica:</strong> o QR Code é gerado pela máquina de reciclagem parceira após a identificação do material.</div>
+  <div class="qr-actions">
+    <button id="startQrCamera" class="outline" type="button">Abrir câmera</button>
+    <div class="qr-manual">
+      <input id="qrCodeInput" type="text" placeholder="Ex.: QR001" autocomplete="off" aria-label="Código do QR Code">
+      <button id="useQrCode" class="primary" type="button">Validar QR Code</button>
+    </div>
+  </div>
+  <small class="qr-fallback">Se a leitura automática não funcionar no seu navegador, digite o código do QR manualmente.</small>
+</section>
+</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="js/app.js"></script>
+</body></html>

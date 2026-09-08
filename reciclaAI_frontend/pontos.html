@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meus Pontos · Recicla AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">♻</div><div class="brand-copy"><strong>Recicla AI</strong><small>Juntos por um futuro mais limpo.</small></div></div>
+  <div class="sidebar-user"><div class="avatar">JS</div><div><strong>João Silva</strong><small>Usuário</small></div></div>
+  <nav class="sidebar-nav"><a class="nav-link" href="dashboard.html"><span class="ico">⌂</span>Início</a>
+<a class="nav-link mobile-hide" href="perfil.html"><span class="ico">♙</span>Meu Perfil</a>
+<a class="nav-link active mobile-hide" href="pontos.html"><span class="ico">★</span>Meus Pontos</a>
+<a class="nav-link mobile-hide" href="historico.html"><span class="ico">◴</span>Histórico</a>
+<a class="nav-link" href="qrcode.html"><span class="ico">⌗</span>Ler QR Code</a>
+<a class="nav-link" href="ecopontos.html"><span class="ico">⌖</span>Ecopontos</a>
+<a class="nav-link" href="recompensas.html"><span class="ico">♧</span>Recompensas</a></nav>
+  <div class="sidebar-footer"><a class="logout-link" href="index.html">↪ <span>Sair</span></a></div>
+</aside>
+<main class="app-main">
+
+<header class="topbar">
+  <div class="mobile-brand">♻ <span>Recicla AI</span></div>
+  <div class="top-actions">
+    <button class="icon-circle" onclick="toast('Você não possui novas notificações.')" aria-label="Notificações">♧</button>
+    <div class="top-user"><div class="avatar">JS</div><span>João Silva⌄</span></div>
+  </div>
+</header>
+<div class="page-wrap">
+  <div class="page-head">
+    <div>
+      <h1>Meus Pontos</h1>
+      <p>Acompanhe sua pontuação e seu progresso dentro do Recicla AI.</p>
+    </div>
+  </div>
+
+  <section class="points-hero card">
+    <div class="points-hero-icon">★</div>
+    <div class="points-hero-label">Total acumulado</div>
+    <strong class="points-hero-value" data-points>0</strong>
+    <div class="points-hero-unit">pontos</div>
+  </section>
+
+  <div class="points-stats-grid">
+    <section class="point-stat-card card">
+      <div class="point-stat-icon">♻</div>
+      <strong id="recyclingCount" class="point-stat-value">0</strong>
+      <span class="point-stat-label">Reciclagens realizadas</span>
+    </section>
+
+    <section class="point-stat-card card">
+      <div class="point-stat-icon">↗</div>
+      <strong id="pointsThisMonth" class="point-stat-value">0</strong>
+      <span class="point-stat-label">Pontos ganhos este mês</span>
+    </section>
+
+    <section class="point-stat-card card">
+      <div class="point-stat-icon">🎁</div>
+      <strong id="redemptionsCount" class="point-stat-value">0</strong>
+      <span class="point-stat-label">Resgates realizados</span>
+    </section>
+  </div>
+
+  <section class="points-summary-card card">
+    <div class="section-head">
+      <h2>Resumo da sua pontuação</h2>
+      <a class="inline-link" href="historico.html">Ver histórico →</a>
+    </div>
+    <div class="points-summary-note">🌱 Continue reciclando para acumular pontos e desbloquear novas recompensas.</div>
+  </section>
+</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="js/app.js"></script>
+</body>
+</html>

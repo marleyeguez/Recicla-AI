@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Histórico · Recicla AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">♻</div><div class="brand-copy"><strong>Recicla AI</strong><small>Juntos por um futuro mais limpo.</small></div></div>
+  <div class="sidebar-user"><div class="avatar">JS</div><div><strong>João Silva</strong><small>Usuário</small></div></div>
+  <nav class="sidebar-nav"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Início</a>
+<a class="nav-link  mobile-hide" href="perfil.html"><span class="ico">♙</span>Meu Perfil</a>
+<a class="nav-link  mobile-hide" href="pontos.html"><span class="ico">★</span>Meus Pontos</a>
+<a class="nav-link active mobile-hide" href="historico.html"><span class="ico">◴</span>Histórico</a>
+<a class="nav-link  " href="qrcode.html"><span class="ico">⌗</span>Ler QR Code</a>
+<a class="nav-link  " href="ecopontos.html"><span class="ico">⌖</span>Ecopontos</a>
+<a class="nav-link  " href="recompensas.html"><span class="ico">♧</span>Recompensas</a></nav>
+  <div class="sidebar-footer"><a class="logout-link" href="index.html">↪ <span>Sair</span></a></div>
+</aside>
+<main class="app-main">
+
+<header class="topbar">
+  <div class="mobile-brand">♻ <span>Recicla AI</span></div>
+  <div class="top-actions">
+    <button class="icon-circle" onclick="toast('Você não possui novas notificações.')">♧</button>
+    <div class="top-user"><div class="avatar">JS</div><span>João Silva⌄</span></div>
+  </div>
+</header>
+<div class="page-wrap">
+<div class="page-head"><div><h1>Histórico de Pontos</h1><p>Veja todas as movimentações da sua conta.</p></div></div>
+<div class="tabs"><button class="chip active" data-history-filter="todos">Todos</button><button class="chip" data-history-filter="ganhos">Ganhos</button><button class="chip" data-history-filter="resgates">Resgates</button></div>
+<section id="historyList" class="history-list card"></section>
+</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="js/app.js"></script>
+</body></html>

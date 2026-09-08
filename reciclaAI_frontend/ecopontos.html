@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ecopontos · Recicla AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">♻</div><div class="brand-copy"><strong>Recicla AI</strong><small>Juntos por um futuro mais limpo.</small></div></div>
+  <div class="sidebar-user"><div class="avatar">JS</div><div><strong>João Silva</strong><small>Usuário</small></div></div>
+  <nav class="sidebar-nav"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Início</a>
+<a class="nav-link  mobile-hide" href="perfil.html"><span class="ico">♙</span>Meu Perfil</a>
+<a class="nav-link  mobile-hide" href="pontos.html"><span class="ico">★</span>Meus Pontos</a>
+<a class="nav-link  mobile-hide" href="historico.html"><span class="ico">◴</span>Histórico</a>
+<a class="nav-link  " href="qrcode.html"><span class="ico">⌗</span>Ler QR Code</a>
+<a class="nav-link active " href="ecopontos.html"><span class="ico">⌖</span>Ecopontos</a>
+<a class="nav-link  " href="recompensas.html"><span class="ico">♧</span>Recompensas</a></nav>
+  <div class="sidebar-footer"><a class="logout-link" href="index.html">↪ <span>Sair</span></a></div>
+</aside>
+<main class="app-main">
+
+<header class="topbar">
+  <div class="mobile-brand">♻ <span>Recicla AI</span></div>
+  <div class="top-actions">
+    <button class="icon-circle" onclick="toast('Você não possui novas notificações.')">♧</button>
+    <div class="top-user"><div class="avatar">JS</div><span>João Silva⌄</span></div>
+  </div>
+</header>
+<div class="page-wrap">
+<div class="page-head"><div><h1>Ecopontos</h1><p>Encontre os pontos de coleta mais próximos de você.</p></div><div class="location-pill">⌖ Sua localização</div></div>
+<div class="search-shell"><span>⌕</span><input id="ecoSearch" placeholder="Buscar ecopontos, endereços..."></div>
+<div class="filters"><button class="chip active">Todos</button><button class="chip">PET</button><button class="chip">Papel</button><button class="chip">Metal</button><button class="chip">Vidro</button></div>
+<div class="eco-layout">
+  <div id="ecoList" class="eco-list"></div>
+  <div class="map card">
+    <div class="map-title">Ecopontos próximos</div>
+    <span class="map-pin mp1">●</span><span class="map-pin mp2">●</span><span class="map-pin mp3">●</span><span class="map-pin mp4">●</span><span class="map-pin mp5">●</span><span class="map-pin user mpu">●</span>
+  </div>
+</div>
+</div>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="js/app.js"></script>
+</body></html>

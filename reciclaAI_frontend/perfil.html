@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meu Perfil · Recicla AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+
+<aside class="sidebar">
+  <div class="brand"><div class="brand-mark">♻</div><div class="brand-copy"><strong>Recicla AI</strong><small>Juntos por um futuro mais limpo.</small></div></div>
+  <div class="sidebar-user"><div class="avatar">JS</div><div><strong>João Silva</strong><small>Usuário</small></div></div>
+  <nav class="sidebar-nav"><a class="nav-link  " href="dashboard.html"><span class="ico">⌂</span>Início</a>
+<a class="nav-link active mobile-hide" href="perfil.html"><span class="ico">♙</span>Meu Perfil</a>
+<a class="nav-link  mobile-hide" href="pontos.html"><span class="ico">★</span>Meus Pontos</a>
+<a class="nav-link  mobile-hide" href="historico.html"><span class="ico">◴</span>Histórico</a>
+<a class="nav-link  " href="qrcode.html"><span class="ico">⌗</span>Ler QR Code</a>
+<a class="nav-link  " href="ecopontos.html"><span class="ico">⌖</span>Ecopontos</a>
+<a class="nav-link  " href="recompensas.html"><span class="ico">♧</span>Recompensas</a></nav>
+  <div class="sidebar-footer"><a class="logout-link" href="index.html">↪ <span>Sair</span></a></div>
+</aside>
+<main class="app-main">
+
+<header class="topbar">
+  <div class="mobile-brand">♻ <span>Recicla AI</span></div>
+  <div class="top-actions">
+    <button class="icon-circle" onclick="toast('Você não possui novas notificações.')">♧</button>
+    <div class="top-user"><div class="avatar">JS</div><span>João Silva⌄</span></div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="page-head">
+    <div>
+      <h1>Meu Perfil</h1>
+      <p>Gerencie seus dados, foto, segurança e preferências em um só lugar.</p>
+    </div>
+  </div>
+
+  <section class="profile-hero-card card">
+    <div class="profile-photo-row">
+      <div class="profile-avatar-large" data-profile-avatar>JS</div>
+
+      <div class="profile-identity">
+        <h2 data-profile-name>João Silva</h2>
+        <p data-profile-email>joao@email.com</p>
+
+        <div class="profile-photo-actions">
+          <input id="profilePhotoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+          <button id="changeProfilePhoto" class="outline" type="button">Trocar foto</button>
+          <button id="removeProfilePhoto" class="text-button danger-text" type="button">Remover foto</button>
+        </div>
+        <small class="profile-photo-help">PNG, JPG ou WEBP. Por enquanto, a imagem fica salva apenas neste navegador.</small>
+      </div>
+    </div>
+  </section>
+
+  <div class="profile-main-grid">
+    <div class="profile-column">
+      <section class="profile-section-card card">
+        <div class="profile-section-head">
+          <div>
+            <h3>Informações pessoais</h3>
+            <p>Edite os dados principais exibidos na sua conta.</p>
+          </div>
+        </div>
+
+        <div class="profile-form-grid">
+          <label class="profile-field">
+            Nome
+            <input id="profileName" type="text" value="João Silva" autocomplete="name">
+          </label>
+
+          <label class="profile-field">
+            E-mail
+            <input id="profileEmail" type="email" value="joao@email.com" autocomplete="email">
+          </label>
+        </div>
+
+        <div class="profile-actions">
+          <button id="saveProfile" class="primary" type="button">Salvar informações</button>
+        </div>
+      </section>
+
+      <section class="profile-section-card card">
+        <div class="profile-section-head">
+          <div>
+            <h3>Conta e segurança</h3>
+            <p>Seu acesso é protegido por senha e token de autenticação. A troca de senha será adicionada quando criarmos a rota específica da API.</p>
+          </div>
+        </div>
+
+        <div class="privacy-note">
+          A senha nunca é exibida pelo site e permanece protegida pelo hash armazenado no banco de dados.
+        </div>
+      </section>
+    </div>
+
+    <div class="profile-column">
+      <section class="profile-points-card card">
+        <div class="profile-points-icon">★</div>
+        <div>
+          <span>Seus pontos atuais</span>
+          <strong><span data-points>240</span> pontos</strong>
+          <a class="inline-link" href="pontos.html">Ver meus pontos →</a>
+        </div>
+      </section>
+
+      <section class="profile-section-card card">
+        <div class="profile-section-head">
+          <div>
+            <h3>Preferências</h3>
+            <p>Estas opções são carregadas e salvas diretamente na sua conta.</p>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-copy">
+            <strong>Receber notificações</strong>
+            <small>Permitir notificações relacionadas à sua conta e ao Recicla AI.</small>
+          </div>
+          <button class="toggle on" type="button" data-toggle data-setting="notificacoes" aria-pressed="true" aria-label="Receber notificações"></button>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-copy">
+            <strong>Usar minha localização</strong>
+            <small>Permitir o uso da localização para encontrar ecopontos próximos.</small>
+          </div>
+          <button class="toggle on" type="button" data-toggle data-setting="localizacao" aria-pressed="true" aria-label="Usar minha localização"></button>
+        </div>
+
+        <div class="privacy-note">
+          Nome, e-mail e preferências agora são salvos no MySQL pela API. A foto continua local até criarmos o endpoint de upload.
+        </div>
+
+        <div class="profile-actions">
+          <button id="savePreferences" class="primary" type="button">Salvar preferências</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="js/app.js"></script>
+</body></html>
