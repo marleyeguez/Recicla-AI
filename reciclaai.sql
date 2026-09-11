@@ -10,7 +10,7 @@ CREATE TABLE usuarios (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
-    foto VARCHAR(255),
+    foto MEDIUMTEXT NULL,
     pontos INT NOT NULL DEFAULT 100,
     notificacoes BOOLEAN NOT NULL DEFAULT TRUE,
     localizacao BOOLEAN NOT NULL DEFAULT TRUE,

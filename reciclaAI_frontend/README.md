@@ -67,3 +67,7 @@ O token JWT é salvo no `sessionStorage` por padrão. Se o usuário marcar **Lem
 As páginas internas verificam a existência/validade do token e redirecionam para o login quando necessário. A proteção real dos dados continua sendo responsabilidade das rotas JWT no back-end.
 
 A foto de perfil ainda fica somente no navegador porque ainda não existe endpoint de upload. Histórico, QR Code, ecopontos e recompensas continuam com dados de protótipo até as próximas APIs.
+
+## Ajuste atual
+- Barras de filtros removidas das páginas.
+- Foto de perfil agora é vinculada ao usuário pela API (`PATCH /usuarios/me`) e não por uma chave global do navegador.

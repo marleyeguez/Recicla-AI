@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ler QR Code · Recicla AI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -27,7 +27,6 @@
 <header class="topbar">
   <div class="mobile-brand">♻ <span>Recicla AI</span></div>
   <div class="top-actions">
-    <button class="icon-circle" onclick="toast('Você não possui novas notificações.')">♧</button>
     <div class="top-user"><div class="avatar">JS</div><span>João Silva⌄</span></div>
   </div>
 </header>
@@ -36,7 +35,7 @@
 <section class="scanner-card card">
   <div class="scanner-frame">
     <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-    <div id="qrPlaceholder" class="qr-glyph">▦</div><video id="qrVideo" class="qr-video" playsinline muted hidden></video><div class="scan-line"></div>
+    <div id="qrPlaceholder" class="qr-glyph">▦</div><video id="qrVideo" class="qr-video" playsinline muted hidden></video><div id="qrHtml5Reader" class="qr-html5-reader" hidden></div><div class="scan-line"></div>
   </div>
   <h3 id="qrStatus">Aguardando leitura do QR Code...</h3>
   <div class="scanner-tip">ⓘ <strong>Dica:</strong> o QR Code é gerado pela máquina de reciclagem parceira após a identificação do material.</div>
@@ -53,5 +52,6 @@
 </main>
 </div>
 <div id="toast" class="toast"></div>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/app.js"></script>
 </body></html>

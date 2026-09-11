@@ -1,14 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { AppModule } from './app.module.js'; 
+import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
-
+  // Front e API ficam no mesmo domínio. Railway entrega HTTPS na borda.
+  // O host 0.0.0.0 é necessário para a aplicação aceitar tráfego do deploy.
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -25,10 +25,12 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup('api_recicla_ai', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = Number(process.env.PORT || 3000);
+  await app.listen(port, '0.0.0.0');
+
+  console.log(`Recicla AI rodando na porta ${port}`);
 }
 
 bootstrap();

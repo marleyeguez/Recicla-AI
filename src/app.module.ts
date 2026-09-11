@@ -8,6 +8,7 @@ import { UsuariosModule } from './usuarios/usuarios.module.js';
 import { QrcodesModule } from './qrcodes/qrcodes.module.js';
 import { HistoricoModule } from './historico/historico.module.js';
 import { PontosModule } from './pontos/pontos.module.js';
+import { EcopontosModule } from './ecopontos/ecopontos.module.js';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PontosModule } from './pontos/pontos.module.js';
     QrcodesModule,
     HistoricoModule,
     PontosModule,
+    EcopontosModule,
   ],
 })
 export class AppModule {}

@@ -1,6 +1,5 @@
 const AUTH_TOKEN_KEY = "recicla_token";
 const AUTH_USER_KEY = "recicla_user";
-const LOCAL_PHOTO_KEY = "recicla_profile_photo";
 
 function getAuthToken(){
   return localStorage.getItem(AUTH_TOKEN_KEY) || sessionStorage.getItem(AUTH_TOKEN_KEY);
@@ -88,14 +87,12 @@ const cachedUser = getCachedUser();
 const state = {
   points: Number(cachedUser?.pontos ?? 0),
   history: [],
-  historyFilter: "todos",
 };
 
-const ecopoints = [
-  {name:"Ecoponto Recicla Mais", address:"Av. Mutinga, 123 · Perus, SP", materials:"PET, Papel, Plástico, Vidro, Metal", distance:"2,3 km"},
-  {name:"CoopRecicla", address:"R. dos Flores, 456 · Perus, SP", materials:"Papel, Plástico, Metal", distance:"3,1 km"},
-  {name:"Green Park", address:"Av. Torres, 789 · Jaraguá, SP", materials:"Vidro, Metal, Eletrônicos", distance:"4,8 km"}
-];
+let ecopoints = [];
+let ecoUserLocation = null;
+let ecoMap = null;
+let ecoMarkersLayer = null;
 
 const rewards = [
   {icon:"🎟️", name:"Vale Presente", label:"Cupom de parceiro", points:500},
@@ -126,8 +123,17 @@ function initials(name){
   return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
 }
 
+function escapeHtml(value){
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function getProfilePhoto(user){
-  return user?.foto || localStorage.getItem(LOCAL_PHOTO_KEY) || "";
+  return user?.foto || "";
 }
 
 function applyUserToUI(user){
@@ -141,6 +147,12 @@ function applyUserToUI(user){
   document.querySelectorAll(".top-user > span").forEach(el => el.textContent = user.nome + "⌄");
   document.querySelectorAll("[data-profile-name]").forEach(el => el.textContent = user.nome);
   document.querySelectorAll("[data-profile-email]").forEach(el => el.textContent = user.email);
+  document.querySelectorAll("[data-dashboard-greeting]").forEach(el => {
+    const firstName = String(user.nome || "").trim().split(/\s+/)[0] || "Usuário";
+    el.textContent = `Olá, ${firstName}!`;
+  });
+  document.querySelectorAll("[data-user-menu-name]").forEach(el => el.textContent = user.nome);
+  document.querySelectorAll("[data-user-menu-email]").forEach(el => el.textContent = user.email);
 
   const nameInput = document.getElementById("profileName");
   const emailInput = document.getElementById("profileEmail");
@@ -271,14 +283,8 @@ function historyMarkup(limit){
     </div>`).join("");
 }
 
-function filteredHistory(){
-  if(state.historyFilter === "ganhos") return state.history.filter(item => item.points >= 0);
-  if(state.historyFilter === "resgates") return state.history.filter(item => item.points < 0);
-  return state.history;
-}
-
 function fullHistoryMarkup(){
-  const items = filteredHistory();
+  const items = state.history;
   if(!items.length) return historyEmptyMarkup();
 
   return items.map(item => `
@@ -366,38 +372,267 @@ function renderCommon(){
   if(list) list.innerHTML = fullHistoryMarkup();
 }
 
+function formatDistance(distanceKm){
+  const value = Number(distanceKm || 0);
+
+  if(value < 1){
+    return `${Math.max(1, Math.round(value * 1000))} m`;
+  }
+
+  return `${value.toLocaleString("pt-BR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  })} km`;
+}
+
 function renderEcopoints(list = ecopoints){
   const wrap = document.getElementById("ecoList");
   if(!wrap) return;
 
-  wrap.innerHTML = list.map(e => `
-    <article class="eco-card card">
-      <div class="eco-pin">⌖</div>
-      <div><strong>${e.name}</strong><small>${e.address}</small><small>Materiais: ${e.materials}</small></div>
-      <div><div class="eco-distance">${e.distance}</div><button class="mini-btn" onclick="toast('Detalhes de ${e.name}')">Ver detalhes</button></div>
-    </article>`).join("");
+  if(!list.length){
+    wrap.innerHTML = `
+      <div class="eco-empty card">
+        <strong>Nenhum ponto de coleta encontrado.</strong>
+        <small>Tente novamente ou permita que o navegador use sua localização.</small>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map((e, index) => {
+    const materials = Array.isArray(e.materiais) && e.materiais.length
+      ? `Materiais: ${escapeHtml(e.materiais.join(", "))}`
+      : "Materiais aceitos não informados";
+
+    return `
+      <article class="eco-card card ${index === 0 ? "eco-nearest" : ""}">
+        <div class="eco-pin">⌖</div>
+        <div>
+          <strong>${escapeHtml(e.nome)}</strong>
+          <small>${escapeHtml(e.endereco)}</small>
+          <small>${materials}</small>
+        </div>
+        <div class="eco-distance-wrap">
+          ${index === 0 ? '<span class="nearest-badge">Mais próximo</span>' : ''}
+          <div class="eco-distance">${formatDistance(e.distanciaKm)}</div>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function getBrowserLocation(){
+  return new Promise((resolve, reject) => {
+    if(!window.isSecureContext && location.hostname !== "localhost"){
+      reject(new Error("A localização exige HTTPS. Abra a versão segura do site."));
+      return;
+    }
+
+    if(!navigator.geolocation){
+      reject(new Error("Seu navegador não oferece suporte à localização."));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      position => resolve({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      }),
+      error => {
+        if(error.code === error.PERMISSION_DENIED){
+          reject(new Error("Permita o acesso à localização para encontrar ecopontos próximos."));
+          return;
+        }
+
+        if(error.code === error.TIMEOUT){
+          reject(new Error("Não foi possível obter sua localização a tempo. Tente novamente."));
+          return;
+        }
+
+        reject(new Error("Não foi possível obter sua localização atual."));
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 30000,
+      },
+    );
+  });
+}
+
+function updateEcoMap(userLocation, list){
+  const mapElement = document.getElementById("ecoMap");
+  const L = window.L;
+
+  if(!mapElement || !L) return;
+
+  if(!ecoMap){
+    ecoMap = L.map(mapElement, {
+      zoomControl: true,
+    });
+
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      },
+    ).addTo(ecoMap);
+  }
+
+  if(ecoMarkersLayer){
+    ecoMarkersLayer.remove();
+  }
+
+  ecoMarkersLayer = L.layerGroup().addTo(ecoMap);
+
+  const bounds = [];
+  const userLatLng = [userLocation.latitude, userLocation.longitude];
+  bounds.push(userLatLng);
+
+  L.circleMarker(userLatLng, {
+    radius: 8,
+    color: "#ffffff",
+    weight: 3,
+    fillColor: "#1687e8",
+    fillOpacity: 1,
+  })
+    .bindTooltip("Sua localização")
+    .addTo(ecoMarkersLayer);
+
+  list.forEach((e, index) => {
+    const point = [e.latitude, e.longitude];
+    bounds.push(point);
+
+    L.circleMarker(point, {
+      radius: index === 0 ? 9 : 7,
+      color: "#ffffff",
+      weight: 2,
+      fillColor: "#087a4b",
+      fillOpacity: 1,
+    })
+      .bindTooltip(
+        `<strong>${escapeHtml(e.nome)}</strong><br>${formatDistance(e.distanciaKm)}`,
+      )
+      .addTo(ecoMarkersLayer);
+  });
+
+  if(bounds.length > 1){
+    ecoMap.fitBounds(bounds, {
+      padding: [40, 40],
+      maxZoom: 15,
+    });
+  } else {
+    ecoMap.setView(userLatLng, 14);
+  }
+
+  setTimeout(() => ecoMap.invalidateSize(), 100);
+}
+
+async function loadNearbyEcopoints(){
+  const wrap = document.getElementById("ecoList");
+  if(!wrap) return;
+
+  const locationStatus = document.getElementById("locationStatus");
+  const user = getCachedUser();
+
+  // Respeita de verdade a preferência salva no perfil.
+  if(user && user.localizacao === false){
+    ecopoints = [];
+    ecoUserLocation = null;
+    if(locationStatus){
+      locationStatus.textContent = "⌖ Localização desativada";
+    }
+    wrap.innerHTML = `
+      <div class="eco-empty card">
+        <strong>Localização desativada nas suas preferências.</strong>
+        <small>Ative “Usar minha localização” no Meu Perfil para encontrar pontos de coleta próximos.</small>
+        <a class="outline eco-retry" href="perfil.html">Ir para Meu Perfil</a>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="eco-loading card">
+      <span class="eco-loading-dot"></span>
+      Buscando pontos de coleta próximos...
+    </div>`;
+
+  if(locationStatus){
+    locationStatus.textContent = "⌖ Obtendo localização...";
+  }
+
+  try {
+    const location = await getBrowserLocation();
+    ecoUserLocation = location;
+
+    if(locationStatus){
+      locationStatus.textContent = "⌖ Localização atual";
+    }
+
+    const params = new URLSearchParams({
+      latitude: String(location.latitude),
+      longitude: String(location.longitude),
+      limite: "5",
+    });
+
+    const response = await apiFetch(
+      `/ecopontos/proximos?${params.toString()}`,
+      {},
+      true,
+    );
+
+    const data = await parseResponse(response);
+
+    if(response.status === 401){
+      redirectToLogin();
+      return;
+    }
+
+    if(!response.ok){
+      throw new Error(apiMessage(data, "Erro ao buscar ecopontos."));
+    }
+
+    ecopoints = Array.isArray(data.ecopontos)
+      ? data.ecopontos
+      : [];
+
+    renderEcopoints(ecopoints);
+    updateEcoMap(location, ecopoints);
+  } catch(error) {
+    ecopoints = [];
+    ecoUserLocation = null;
+
+    if(locationStatus){
+      locationStatus.textContent = "⌖ Localização indisponível";
+    }
+
+    wrap.innerHTML = `
+      <div class="eco-empty card">
+        <strong>Não foi possível mostrar os ecopontos próximos.</strong>
+        <small>${escapeHtml(error.message || "Tente novamente.")}</small>
+        <button id="retryEcoLocation" class="outline eco-retry" type="button">Tentar novamente</button>
+      </div>`;
+
+    document.getElementById("retryEcoLocation")?.addEventListener(
+      "click",
+      loadNearbyEcopoints,
+      { once: true },
+    );
+  }
 }
 
 function renderRewards(){
   const wrap = document.getElementById("rewardGrid");
   if(!wrap) return;
 
-  wrap.innerHTML = rewards.map((r, i) => `
+  wrap.innerHTML = rewards.map((r) => `
     <article class="reward-card card">
       <div class="reward-visual">${r.icon}</div>
       <strong>${r.name}</strong><small>${r.label}</small>
       <div class="reward-points">${r.points.toLocaleString("pt-BR")} pontos</div>
-      <button class="primary" onclick="redeem(${i})">Resgatar</button>
+      <div class="reward-app-only" role="note" aria-label="Resgate disponível somente pelo aplicativo">
+        Resgate pelo aplicativo
+      </div>
     </article>`).join("");
-}
-
-function redeem(i){
-  const reward = rewards[i];
-  if(state.points < reward.points){
-    toast("Você ainda precisa de " + (reward.points - state.points) + " pontos.");
-    return;
-  }
-  toast("O resgate será concluído pelo aplicativo.");
 }
 
 async function useQrCode(codigo){
@@ -461,8 +696,9 @@ async function useQrCode(codigo){
 
 let qrCameraStream = null;
 let qrCameraTimer = null;
+let html5QrScanner = null;
 
-function stopQrCamera(){
+async function stopQrCamera(){
   if(qrCameraTimer){
     clearInterval(qrCameraTimer);
     qrCameraTimer = null;
@@ -473,19 +709,103 @@ function stopQrCamera(){
     qrCameraStream = null;
   }
 
+  if(html5QrScanner){
+    try {
+      await html5QrScanner.stop();
+    } catch {
+      // Scanner já estava parado.
+    }
+    try {
+      html5QrScanner.clear();
+    } catch {}
+    html5QrScanner = null;
+  }
+
   const video = document.getElementById("qrVideo");
   if(video){
     video.srcObject = null;
     video.hidden = true;
   }
 
+  const reader = document.getElementById("qrHtml5Reader");
+  if(reader){
+    reader.innerHTML = "";
+    reader.hidden = true;
+  }
+
   const placeholder = document.getElementById("qrPlaceholder");
   if(placeholder) placeholder.hidden = false;
 }
 
+async function finishQrCameraRead(code){
+  const normalized = String(code || "").trim();
+  if(!normalized) return;
+
+  await stopQrCamera();
+  const input = document.getElementById("qrCodeInput");
+  if(input) input.value = normalized;
+  await useQrCode(normalized);
+}
+
+async function startQrWithHtml5(){
+  if(typeof window.Html5Qrcode !== "function") return false;
+
+  const reader = document.getElementById("qrHtml5Reader");
+  const placeholder = document.getElementById("qrPlaceholder");
+  if(!reader) return false;
+
+  reader.hidden = false;
+  if(placeholder) placeholder.hidden = true;
+
+  html5QrScanner = new window.Html5Qrcode("qrHtml5Reader");
+
+  await html5QrScanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 230, height: 230 }, aspectRatio: 1 },
+    decodedText => finishQrCameraRead(decodedText),
+    () => {},
+  );
+
+  return true;
+}
+
+async function startQrWithBarcodeDetector(){
+  if(!("BarcodeDetector" in window) || !navigator.mediaDevices?.getUserMedia){
+    return false;
+  }
+
+  qrCameraStream = await navigator.mediaDevices.getUserMedia({
+    video: {facingMode: {ideal: "environment"}},
+    audio: false,
+  });
+
+  const video = document.getElementById("qrVideo");
+  const placeholder = document.getElementById("qrPlaceholder");
+  if(!video) return false;
+
+  video.srcObject = qrCameraStream;
+  video.hidden = false;
+  if(placeholder) placeholder.hidden = true;
+  await video.play();
+
+  const detector = new BarcodeDetector({formats:["qr_code"]});
+
+  qrCameraTimer = setInterval(async () => {
+    try {
+      const codes = await detector.detect(video);
+      const code = codes?.[0]?.rawValue;
+      if(code) await finishQrCameraRead(code);
+    } catch {
+      // O próximo ciclo tenta novamente.
+    }
+  }, 550);
+
+  return true;
+}
+
 async function startQrCamera(){
-  if(!("BarcodeDetector" in window)){
-    toast("Leitura automática não é suportada neste navegador. Digite o código abaixo.");
+  if(!window.isSecureContext && location.hostname !== "localhost"){
+    toast("A câmera exige HTTPS. Abra a versão segura do site.");
     return;
   }
 
@@ -494,42 +814,32 @@ async function startQrCamera(){
     return;
   }
 
+  const button = document.getElementById("startQrCamera");
+  setButtonLoading(button, true, "Abrindo câmera...");
+
   try {
-    stopQrCamera();
+    await stopQrCamera();
 
-    qrCameraStream = await navigator.mediaDevices.getUserMedia({
-      video: {facingMode: {ideal: "environment"}},
-      audio: false,
-    });
+    // html5-qrcode cobre melhor Safari/iPhone e Android.
+    let started = false;
+    try {
+      started = await startQrWithHtml5();
+    } catch {
+      await stopQrCamera();
+    }
 
-    const video = document.getElementById("qrVideo");
-    const placeholder = document.getElementById("qrPlaceholder");
-    if(!video) return;
+    if(!started){
+      started = await startQrWithBarcodeDetector();
+    }
 
-    video.srcObject = qrCameraStream;
-    video.hidden = false;
-    if(placeholder) placeholder.hidden = true;
-    await video.play();
-
-    const detector = new BarcodeDetector({formats:["qr_code"]});
-
-    qrCameraTimer = setInterval(async () => {
-      try {
-        const codes = await detector.detect(video);
-        const code = codes?.[0]?.rawValue;
-        if(!code) return;
-
-        stopQrCamera();
-        const input = document.getElementById("qrCodeInput");
-        if(input) input.value = code;
-        await useQrCode(code);
-      } catch {
-        // O próximo ciclo tenta novamente.
-      }
-    }, 600);
-  } catch {
-    stopQrCamera();
-    toast("Não foi possível acessar a câmera. Você pode digitar o código manualmente.");
+    if(!started){
+      throw new Error("Seu navegador não oferece leitura automática de QR Code.");
+    }
+  } catch(error){
+    await stopQrCamera();
+    toast(error.message || "Não foi possível acessar a câmera. Você pode digitar o código manualmente.");
+  } finally {
+    setButtonLoading(button, false);
   }
 }
 
@@ -641,6 +951,37 @@ function initRegister(){
   });
 }
 
+async function prepararFotoPerfil(file){
+  const imagem = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Não foi possível ler a imagem."));
+      img.src = String(reader.result || "");
+    };
+    reader.onerror = () => reject(new Error("Não foi possível ler a imagem."));
+    reader.readAsDataURL(file);
+  });
+
+  const limite = 300;
+  const escala = Math.min(1, limite / Math.max(imagem.width, imagem.height));
+  const largura = Math.max(1, Math.round(imagem.width * escala));
+  const altura = Math.max(1, Math.round(imagem.height * escala));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = largura;
+  canvas.height = altura;
+
+  const ctx = canvas.getContext("2d");
+  if(!ctx) throw new Error("Não foi possível preparar a imagem.");
+
+  ctx.drawImage(imagem, 0, 0, largura, altura);
+
+  // JPEG reduz bastante o tamanho para caber com folga no PATCH JSON.
+  return canvas.toDataURL("image/jpeg", 0.72);
+}
+
 function initProfilePage(){
   const nameInput = document.getElementById("profileName");
   const emailInput = document.getElementById("profileEmail");
@@ -680,12 +1021,11 @@ function initProfilePage(){
   });
 
   savePreferencesButton?.addEventListener("click", async () => {
-    const notificacoes = document.querySelector('[data-setting="notificacoes"]')?.classList.contains("on") ?? true;
     const localizacao = document.querySelector('[data-setting="localizacao"]')?.classList.contains("on") ?? true;
 
     setButtonLoading(savePreferencesButton, true, "Salvando...");
     try {
-      await updateProfileApi({notificacoes, localizacao});
+      await updateProfileApi({localizacao});
       toast("Preferências salvas no banco.");
     } catch(error){
       toast(error.message || "Não foi possível salvar as preferências.");
@@ -696,7 +1036,7 @@ function initProfilePage(){
 
   changePhotoButton?.addEventListener("click", () => photoInput?.click());
 
-  photoInput?.addEventListener("change", () => {
+  photoInput?.addEventListener("change", async () => {
     const file = photoInput.files?.[0];
     if(!file) return;
 
@@ -707,43 +1047,38 @@ function initProfilePage(){
       return;
     }
 
-    if(file.size > 3 * 1024 * 1024){
-      toast("Escolha uma imagem de até 3 MB.");
+    if(file.size > 5 * 1024 * 1024){
+      toast("Escolha uma imagem de até 5 MB.");
       photoInput.value = "";
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        localStorage.setItem(LOCAL_PHOTO_KEY, String(reader.result || ""));
-        applyUserToUI(getCachedUser());
-        toast("Foto atualizada neste navegador.");
-      } catch {
-        toast("A imagem é grande demais para ser salva neste navegador.");
-      }
-    };
-    reader.readAsDataURL(file);
+    setButtonLoading(changePhotoButton, true, "Salvando...");
+
+    try {
+      const foto = await prepararFotoPerfil(file);
+      await updateProfileApi({foto});
+      toast("Foto salva no seu perfil.");
+    } catch(error){
+      toast(error.message || "Não foi possível atualizar a foto.");
+    } finally {
+      setButtonLoading(changePhotoButton, false);
+      photoInput.value = "";
+    }
   });
 
-  removePhotoButton?.addEventListener("click", () => {
-    localStorage.removeItem(LOCAL_PHOTO_KEY);
-    if(photoInput) photoInput.value = "";
-    applyUserToUI(getCachedUser());
-    toast("Foto removida deste navegador.");
-  });
-}
+  removePhotoButton?.addEventListener("click", async () => {
+    setButtonLoading(removePhotoButton, true, "Removendo...");
 
-function initHistoryFilters(){
-  document.querySelectorAll("[data-history-filter]").forEach(chip => {
-    chip.addEventListener("click", () => {
-      const parent = chip.parentElement;
-      parent?.querySelectorAll("[data-history-filter]").forEach(c => c.classList.remove("active"));
-      chip.classList.add("active");
-      state.historyFilter = chip.dataset.historyFilter || "todos";
-      const list = document.getElementById("historyList");
-      if(list) list.innerHTML = fullHistoryMarkup();
-    });
+    try {
+      await updateProfileApi({foto: ""});
+      toast("Foto removida do seu perfil.");
+    } catch(error){
+      toast(error.message || "Não foi possível remover a foto.");
+    } finally {
+      setButtonLoading(removePhotoButton, false);
+      if(photoInput) photoInput.value = "";
+    }
   });
 }
 
@@ -761,6 +1096,97 @@ function initPasswordToggles(){
       const input = document.getElementById(button.dataset.passwordToggle);
       if(input) input.type = input.type === "password" ? "text" : "password";
     });
+  });
+}
+
+function initTopUserMenu(){
+  const topUser = document.querySelector(".top-user");
+  const topActions = topUser?.closest(".top-actions");
+
+  if(!topUser || !topActions || topActions.querySelector(".user-dropdown")) return;
+
+  const cached = getCachedUser();
+
+  topUser.setAttribute("role", "button");
+  topUser.setAttribute("tabindex", "0");
+  topUser.setAttribute("aria-haspopup", "menu");
+  topUser.setAttribute("aria-expanded", "false");
+  topUser.setAttribute("aria-label", "Abrir menu da conta");
+
+  const menu = document.createElement("div");
+  menu.className = "user-dropdown";
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-hidden", "true");
+
+  menu.innerHTML = `
+    <div class="user-dropdown-head">
+      <strong data-user-menu-name>${escapeHtml(cached?.nome || "Usuário")}</strong>
+      <small data-user-menu-email>${escapeHtml(cached?.email || "")}</small>
+    </div>
+
+    <a class="user-dropdown-item" href="perfil.html" role="menuitem">
+      <span class="user-dropdown-icon">♙</span>
+      <span>Meu Perfil</span>
+    </a>
+
+    <a class="user-dropdown-item" href="pontos.html" role="menuitem">
+      <span class="user-dropdown-icon">★</span>
+      <span>Meus Pontos</span>
+    </a>
+
+    <div class="user-dropdown-separator"></div>
+
+    <button class="user-dropdown-item user-dropdown-logout logout-link" type="button" role="menuitem">
+      <span class="user-dropdown-icon">↪</span>
+      <span>Sair</span>
+    </button>
+  `;
+
+  topActions.appendChild(menu);
+
+  function setOpen(open){
+    menu.classList.toggle("open", open);
+    menu.setAttribute("aria-hidden", open ? "false" : "true");
+    topUser.setAttribute("aria-expanded", open ? "true" : "false");
+
+    if(open){
+      const firstItem = menu.querySelector(".user-dropdown-item");
+      window.setTimeout(() => firstItem?.focus(), 0);
+    }
+  }
+
+  function toggleMenu(){
+    setOpen(!menu.classList.contains("open"));
+  }
+
+  topUser.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleMenu();
+  });
+
+  topUser.addEventListener("keydown", event => {
+    if(event.key === "Enter" || event.key === " " || event.key === "ArrowDown"){
+      event.preventDefault();
+      setOpen(true);
+    }
+  });
+
+  menu.addEventListener("click", event => {
+    event.stopPropagation();
+    if(event.target.closest("a")) setOpen(false);
+  });
+
+  document.addEventListener("click", event => {
+    if(!menu.classList.contains("open")) return;
+    if(topActions.contains(event.target)) return;
+    setOpen(false);
+  });
+
+  document.addEventListener("keydown", event => {
+    if(event.key === "Escape" && menu.classList.contains("open")){
+      setOpen(false);
+      topUser.focus();
+    }
   });
 }
 
@@ -870,14 +1296,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   if(!canContinue) return;
 
   renderCommon();
-  renderEcopoints();
   renderRewards();
+  await loadNearbyEcopoints();
   initProfilePage();
   initMobileMoreMenu();
   initLogin();
   initRegister();
-  initHistoryFilters();
   initPasswordToggles();
+  initTopUserMenu();
   initLogout();
 
   if(document.getElementById("recentActivities") || document.getElementById("historyList")){
@@ -892,17 +1318,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if(search){
     search.addEventListener("input", e => {
       const q = e.target.value.toLowerCase().trim();
-      renderEcopoints(ecopoints.filter(x => (x.name + " " + x.address + " " + x.materials).toLowerCase().includes(q)));
+      const filtered = ecopoints.filter(x => (`${x.nome} ${x.endereco} ${(x.materiais || []).join(" ")}`).toLowerCase().includes(q));
+      renderEcopoints(filtered);
+      if(ecoUserLocation) updateEcoMap(ecoUserLocation, filtered);
     });
   }
 
-  document.querySelectorAll(".chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      const parent = chip.parentElement;
-      parent?.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-      chip.classList.add("active");
-    });
-  });
 
   const useQr = document.getElementById("useQrCode");
   const qrInput = document.getElementById("qrCodeInput");
