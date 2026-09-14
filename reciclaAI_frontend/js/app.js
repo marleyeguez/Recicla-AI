@@ -46,12 +46,12 @@ function currentPage(){
 }
 
 function isPublicPage(){
-  return ["", "index.html", "cadastro.html"].includes(currentPage());
+  return ["", "index.html", "login.html", "cadastro.html"].includes(currentPage());
 }
 
 function redirectToLogin(){
   clearAuth();
-  location.replace("index.html");
+  location.replace("login.html");
 }
 
 async function parseResponse(response){
@@ -1196,7 +1196,7 @@ function initLogout(){
     if(!link) return;
     event.preventDefault();
     clearAuth();
-    location.href = "index.html";
+    location.href = "login.html";
   });
 }
 
@@ -1241,7 +1241,7 @@ function initMobileMoreMenu(){
         <a class="mobile-more-link ${current === href ? "active" : ""}" href="${href}">
           <span class="ico">${icon}</span>${label}
         </a>`).join("")}
-      <a class="mobile-more-link logout" href="index.html"><span class="ico">↪</span>Sair</a>
+      <a class="mobile-more-link logout" href="login.html"><span class="ico">↪</span>Sair</a>
     </div>`;
 
   document.body.append(overlay, sheet);
@@ -1270,7 +1270,7 @@ async function initAuthentication(){
 
   if(!isPublicPage()){
     if(!token){
-      location.replace("index.html");
+      location.replace("login.html");
       return false;
     }
 
@@ -1278,8 +1278,9 @@ async function initAuthentication(){
     return true;
   }
 
-  // Se já estiver autenticado e abrir login/cadastro, volta para o dashboard.
-  if(token){
+  // Login e cadastro redirecionam usuários já autenticados para o painel.
+  // O index institucional continua acessível mesmo com sessão ativa.
+  if(token && ["login.html", "cadastro.html"].includes(currentPage())){
     const user = await loadCurrentUser({redirectOnUnauthorized:false});
     if(user){
       location.replace("dashboard.html");

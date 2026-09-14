@@ -2538,3 +2538,14 @@ img {
     width: calc(100% - 18px);
   }
 }
+
+/* Integração com o index institucional */
+.login-back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  width:max-content;
+  margin-bottom:18px;
+  text-decoration:none;
+  font-weight:700;
+}

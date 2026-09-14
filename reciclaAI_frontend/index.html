@@ -1,29 +1,270 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Login · Recicla AI</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css"></head>
-<body>
-<div class="login-page">
-  <section class="login-hero">
-    <div class="brand"><div class="brand-mark">♻</div><div class="brand-copy"><strong>Recicla AI</strong><small>Juntos por um futuro mais limpo.</small></div></div>
-    <div class="login-hero-copy">
-      <h1>Recicle hoje,<br><span>conquiste um<br>amanhã melhor.</span></h1>
-      <p>Ganhe pontos reciclando, encontre ecopontos perto de você e troque por recompensas incríveis.</p>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="Recicla AI — plataforma que conecta reciclagem, ecopontos, QR Code e sistema de pontos em uma experiência simples e acessível.">
+  <meta name="theme-color" content="#0f6d45">
+  <title>Recicla AI · Tecnologia para reciclar melhor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/institucional.css">
+  <script defer src="js/institucional.js"></script>
+</head>
+<body class="institutional-page">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="site-header" id="topo">
+    <div class="institutional-container header-inner">
+      <a class="site-brand" href="#topo" aria-label="Recicla AI - início">
+        <span class="brand-symbol" aria-hidden="true">♻</span>
+        <span class="brand-text">Recicla <strong>AI</strong></span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="site-nav">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="site-nav" id="site-nav" aria-label="Navegação principal">
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#recursos">Recursos</a>
+        <a href="#ecopontos">Ecopontos</a>
+        <a href="#sobre">Sobre</a>
+      </nav>
+
+      <div class="header-actions">
+        <a class="button button-ghost" href="login.html">Entrar</a>
+        <a class="button button-primary" href="cadastro.html">Criar conta</a>
+      </div>
     </div>
-    <div class="login-art"><div class="planet">🌎</div><div class="float-leaf a">🌿</div><div class="float-leaf b">🍃</div><div class="float-leaf c">🌱</div></div>
-  </section>
-  <section class="login-side">
-    <form class="login-card" id="loginForm">
-      <h2>Bem-vindo de volta!</h2><p>Faça login para continuar</p>
-      <label class="form-label">E-mail<div class="input-shell"><span>✉</span><input id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="email" required></div></label>
-      <label class="form-label">Senha<div class="input-shell"><span>⌑</span><input id="password" type="password" placeholder="Digite sua senha" required><button id="togglePassword" type="button" class="input-action">◉</button></div></label>
-      <div class="login-options"><label class="checkbox"><input id="rememberMe" type="checkbox"> Lembrar de mim</label><button type="button" class="text-link" onclick="toast('Protótipo: recuperação de senha.')">Esqueceu sua senha?</button></div>
-      <button class="primary full" type="submit">Entrar</button>
-      <p class="login-register">Não tem uma conta? <a class="text-link" href="cadastro.html">Cadastre-se</a></p>
-    </form>
-  </section>
-</div>
-<div id="toast" class="toast"></div>
-<script src="js/app.js"></script></body></html>
+  </header>
+
+  <main id="conteudo">
+    <section class="hero-section">
+      <div class="hero-orb hero-orb-one" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-two" aria-hidden="true"></div>
+
+      <div class="institutional-container hero-layout">
+        <div class="hero-copy">
+          <div class="eyebrow"><span></span>Tecnologia para reciclagem no dia a dia</div>
+          <h1>Recicle de forma simples. <strong>Transforme ações em pontos.</strong></h1>
+          <p class="hero-lead">O Recicla AI conecta pessoas a pontos de coleta, registra reciclagens por QR Code e organiza pontos e histórico em uma plataforma acessível para celular e computador.</p>
+
+          <div class="hero-actions">
+            <a class="button button-primary button-large" href="login.html">Entrar na plataforma</a>
+            <a class="button button-ghost button-large" href="#como-funciona">Conhecer o projeto</a>
+          </div>
+
+          <div class="hero-highlights" aria-label="Principais recursos">
+            <span>QR Code</span>
+            <span>Ecopontos próximos</span>
+            <span>Pontos e histórico</span>
+          </div>
+        </div>
+
+        <div class="product-preview" aria-label="Prévia ilustrativa da plataforma Recicla AI">
+          <div class="preview-phone">
+            <div class="preview-notch" aria-hidden="true"></div>
+            <div class="preview-topbar">
+              <div>
+                <small>Recicla AI</small>
+                <strong>Olá! 👋</strong>
+              </div>
+              <span class="preview-avatar">RA</span>
+            </div>
+
+            <div class="points-card">
+              <span>Seus pontos</span>
+              <strong>100</strong>
+              <small>Saldo inicial da conta</small>
+            </div>
+
+            <div class="preview-actions-grid">
+              <div class="preview-action">
+                <span class="preview-icon">▣</span>
+                <strong>Ler QR</strong>
+                <small>Registrar reciclagem</small>
+              </div>
+              <div class="preview-action">
+                <span class="preview-icon">⌖</span>
+                <strong>Ecopontos</strong>
+                <small>Encontrar por localização</small>
+              </div>
+            </div>
+
+            <div class="preview-list-card">
+              <div class="preview-list-title">
+                <strong>Atividade recente</strong>
+                <span>Histórico</span>
+              </div>
+              <div class="preview-history-row">
+                <span class="history-badge">♻</span>
+                <div><strong>Reciclagem registrada</strong><small>Garrafa PET</small></div>
+                <b>+10</b>
+              </div>
+            </div>
+          </div>
+          <div class="preview-float-card preview-float-one"><span>⌖</span><div><strong>Localização</strong><small>Pontos de coleta próximos</small></div></div>
+          <div class="preview-float-card preview-float-two"><span>★</span><div><strong>Recompensas</strong><small>Catálogo na plataforma</small></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pillars-section" aria-label="Pilares da plataforma">
+      <div class="institutional-container pillars-grid">
+        <article><span>01</span><div><strong>QR Code</strong><small>Registro de reciclagens</small></div></article>
+        <article><span>02</span><div><strong>Localização</strong><small>Ecopontos próximos</small></div></article>
+        <article><span>03</span><div><strong>Pontuação</strong><small>Saldo e histórico</small></div></article>
+        <article><span>04</span><div><strong>Responsivo</strong><small>Desktop e celular</small></div></article>
+      </div>
+    </section>
+
+    <section class="content-section" id="como-funciona">
+      <div class="institutional-container">
+        <div class="section-heading">
+          <span class="section-kicker">Como funciona</span>
+          <h2>Da reciclagem ao acompanhamento dos seus pontos.</h2>
+          <p>O fluxo foi pensado para ser rápido, visual e fácil de demonstrar durante o uso da plataforma.</p>
+        </div>
+
+        <div class="steps-grid">
+          <article class="step-card">
+            <span class="step-number">1</span>
+            <h3>Crie sua conta</h3>
+            <p>Cadastre-se com nome, e-mail e senha para acessar a área do usuário.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">2</span>
+            <h3>Recicle e leia o QR</h3>
+            <p>Use a câmera ou digite o código para registrar uma reciclagem válida.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">3</span>
+            <h3>Receba pontos</h3>
+            <p>A pontuação é adicionada ao saldo e registrada automaticamente no histórico.</p>
+          </article>
+          <article class="step-card">
+            <span class="step-number">4</span>
+            <h3>Acompanhe tudo</h3>
+            <p>Consulte pontos, histórico, ecopontos próximos e o catálogo de recompensas.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section soft-section" id="recursos">
+      <div class="institutional-container">
+        <div class="section-heading centered-heading">
+          <span class="section-kicker">Recursos</span>
+          <h2>Funcionalidades alinhadas ao projeto atual.</h2>
+          <p>Sem promessas de recursos que ainda não fazem parte da versão apresentada.</p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card">
+            <span class="feature-symbol">▣</span>
+            <h3>Leitura de QR Code</h3>
+            <p>Registre reciclagens pela câmera do celular ou pelo código manual, com validação na API.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-symbol">⌖</span>
+            <h3>Ecopontos por localização</h3>
+            <p>Com permissão do usuário, a plataforma usa a localização atual para buscar pontos de coleta próximos.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-symbol">★</span>
+            <h3>Pontos e histórico</h3>
+            <p>O saldo é atualizado após cada reciclagem e o histórico registra as movimentações da conta.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-symbol">◇</span>
+            <h3>Catálogo de recompensas</h3>
+            <p>O site apresenta as recompensas disponíveis. O resgate é previsto para ser realizado pelo aplicativo.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section ecopoints-section" id="ecopontos">
+      <div class="institutional-container ecopoints-layout">
+        <div class="ecopoints-copy">
+          <span class="section-kicker">Ecopontos</span>
+          <h2>Encontre pontos de coleta perto de você.</h2>
+          <p>A área de ecopontos usa a localização em tempo real somente após a permissão do usuário e apresenta os pontos encontrados ordenados por distância.</p>
+          <ul class="check-list">
+            <li><span>✓</span> Localização solicitada pelo navegador</li>
+            <li><span>✓</span> Lista com nome e distância</li>
+            <li><span>✓</span> Visualização em mapa</li>
+            <li><span>✓</span> Experiência adaptada para celular</li>
+          </ul>
+          <a class="button button-primary button-large" href="login.html">Entrar para encontrar ecopontos</a>
+        </div>
+
+        <div class="map-preview" aria-label="Ilustração de mapa com ecopontos próximos">
+          <div class="map-grid" aria-hidden="true"></div>
+          <span class="map-road road-one" aria-hidden="true"></span>
+          <span class="map-road road-two" aria-hidden="true"></span>
+          <span class="map-pin user-pin" aria-label="Sua localização"><i></i></span>
+          <span class="map-pin eco-pin pin-one" aria-label="Ecoponto próximo"><i></i></span>
+          <span class="map-pin eco-pin pin-two" aria-label="Ecoponto próximo"><i></i></span>
+          <div class="nearest-card">
+            <span class="nearest-icon">⌖</span>
+            <div><small>Ecoponto mais próximo</small><strong>Calculado pela sua localização</strong><span>Nome e distância aparecem na plataforma</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section about-section" id="sobre">
+      <div class="institutional-container about-layout">
+        <div>
+          <span class="section-kicker">Sobre o projeto</span>
+          <h2>Tecnologia aplicada a hábitos mais sustentáveis.</h2>
+        </div>
+        <div class="about-copy">
+          <p>O Recicla AI é um Projeto Integrador desenvolvido no curso Técnico em Informática para Internet do SENAC. A proposta é facilitar o descarte correto e incentivar a reciclagem com uma experiência digital simples.</p>
+          <p>Nesta versão, a plataforma reúne cadastro e login, QR Code, sistema de pontos, histórico, ecopontos por localização, perfil do usuário e catálogo de recompensas.</p>
+          <div class="about-tags"><span>Sustentabilidade</span><span>Tecnologia</span><span>Acessibilidade</span><span>Responsividade</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta-section">
+      <div class="institutional-container">
+        <div class="final-cta">
+          <div>
+            <span class="section-kicker">Conheça na prática</span>
+            <h2>Entre na plataforma e veja o Recicla AI funcionando.</h2>
+            <p>Crie uma conta ou faça login para testar as funcionalidades apresentadas.</p>
+          </div>
+          <div class="final-cta-actions">
+            <a class="button button-light button-large" href="login.html">Entrar</a>
+            <a class="button button-outline-light button-large" href="cadastro.html">Criar conta</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="institutional-container footer-layout">
+      <div>
+        <a class="site-brand footer-brand" href="#topo"><span class="brand-symbol" aria-hidden="true">♻</span><span class="brand-text">Recicla <strong>AI</strong></span></a>
+        <p>Uma plataforma acadêmica que aproxima tecnologia e sustentabilidade.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#recursos">Recursos</a>
+        <a href="#ecopontos">Ecopontos</a>
+        <a href="#sobre">Sobre</a>
+      </div>
+      <div class="footer-access">
+        <a href="login.html">Acessar conta</a>
+        <a href="cadastro.html">Criar conta</a>
+      </div>
+    </div>
+    <div class="institutional-container footer-bottom"><span>© 2026 Recicla AI</span><span>Projeto Integrador · Técnico em Informática para Internet</span></div>
+  </footer>
+</body>
+</html>
